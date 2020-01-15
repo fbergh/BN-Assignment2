@@ -117,8 +117,7 @@ if(create_plots){
 # Remove clear outliers (measurement errors)
 rows_before = nrow(ff)
 ff = ff[-which(ff$FFMC < 60 | ff$ISI > 30),]
-removed_outliers = rows_before - nrow(ff)
-cat("Number of removed outliers: ", removed_outliers)
+cat("Number of removed outliers: ", rows_before - nrow(ff))
 
 # If create_plots is set to "TRUE", create QQ-plots and histograms for the FFMC and ISI attributes with outliers removed
 if(create_plots){
