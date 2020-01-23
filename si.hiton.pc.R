@@ -3,6 +3,7 @@
 ################
 
 library(bnlearn)
+source("tools.R")
 
 
 ####################
@@ -21,5 +22,8 @@ head(ff)
 ###################
 # See https://books.google.nl/books?id=Jp4MBwAAQBAJ&pg=PA30&lpg=PA30
 
-result = si.hiton.pc(ff, alpha=0.01)
-plot(result)
+bn_structure = si.hiton.pc(ff, alpha=0.01)
+plot(bn_structure)
+
+dagitty_structure = bnlearn2dagitty(bn_structure)
+plot(dagitty_structure)

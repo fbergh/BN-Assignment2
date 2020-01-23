@@ -3,6 +3,7 @@
 ################
 
 library(bnlearn)
+source("tools.R")
 
 
 ####################
@@ -35,5 +36,8 @@ head(ff)
 # maxp = Inf (max. nr of parents for a node), 
 # optimized = TRUE (whether or not to use score caching)
 
-result = tabu(ff, score = "bge") 
-plot(result)
+bn_structure = tabu(ff, score="bge")
+plot(bn_structure)
+
+dagitty_structure = bnlearn2dagitty(bn_structure)
+plot(dagitty_structure)
