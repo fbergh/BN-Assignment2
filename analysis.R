@@ -24,4 +24,4 @@ result_experiment = run_experiment(ff, is_plot=TRUE, algorithms=c("tabu","hiton"
 
 # result can be indexed like so (the first three indices/entries are from tabu and the other four from si.hiton.pc)
 # result$bn_structures; result$adjacency_mats; result$betweenness; result$degree; result$hamming
-result_comparison = compare_to_original(result_experiment$adjacency_mats)
+result_comparison = compare_to_original(result_experiment$bn_structures, result_experiment$adjacency_mats)

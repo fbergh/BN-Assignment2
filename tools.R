@@ -69,6 +69,21 @@ load_original_net = function() {
     network_object
 }
 
+compute_struct_hamming_distance = function(bn_structures) {
+    print(length((bn_structures)))
+    nr_structs = length(bn_structures)
+    struct_hamming_distance = matrix(0, nr_structs, nr_structs)
+    for (i in 1:nr_structs) {
+        for (j in i:nr_structs) {
+            if (i!=j) {
+                shd = shd(bn_structures[[i]], bn_structures[[j]])
+                struct_hamming_distance[i,j] = struct_hamming_distance[j,i] = shd
+            }
+        }
+    }
+    struct_hamming_distance
+}
+
 # Runs the tabu and si.hiton.pc algorithms with specified parameters
 # The function returns an object with the resulting bnlearn structures, the corresponding adjacency matrices, and the evaluation metrics (betweenness, degree, and hamming). These are accessible by indexing the resulting object with $[key]
 run_experiment = function(data, algorithms=c("tabu","hiton"), 
@@ -98,7 +113,7 @@ run_experiment = function(data, algorithms=c("tabu","hiton"),
     # Set out.dist=FALSE to obtain full distance matrices, instead of shortened once
     betweenness = nd.centrality(adjacency_mats,mode="Between",out.dist=FALSE)
     degree = nd.centrality(adjacency_mats,mode="Degree",out.dist=FALSE)
-    hamming = nd.hamming(adjacency_mats,out.dist=FALSE)
+    hamming = compute_struct_hamming_distance(bn_structures)
     
     # Print and return output
     print(paste("The first",length(exp_values[[1]]),"entries/indices belong to tabu, the rest belong to si.hiton.pc"))
@@ -111,9 +126,11 @@ run_experiment = function(data, algorithms=c("tabu","hiton"),
     return_object
 }
 
-compare_to_original = function(adjacency_mats) {
-    # Put original network at last index of list of adjacency matrices
-    adjacency_mats[[length(adjacency_mats)+1]] = load_original_net()$adjacency_mat
+compare_to_original = function(bn_structures, adjacency_mats) {
+    original_net = load_original_net()
+    # Put original network at last index of structs
+    bn_structures[[length(bn_structures)+1]] = original_net$bnlearn
+    adjacency_mats[[length(adjacency_mats)+1]] = original_net$adjacency_mat
     n_mats = NROW(adjacency_mats)
     
     # Compute metrics and take only the row in which the other networks are compared to the original network
@@ -122,7 +139,7 @@ compare_to_original = function(adjacency_mats) {
     betweenness_orig = list("D"=betweenness$D[n_mats,],"features"=betweenness$features[n_mats,c(6,5,4,7,9,8,11,1,10,2,3)])
     degree = nd.centrality(adjacency_mats,mode="Degree",out.dist=FALSE)
     degree_orig = list("D"=degree$D[n_mats,],"features"=degree$features[n_mats,c(6,5,4,7,9,8,11,1,10,2,3)])
-    hamming = nd.hamming(adjacency_mats,out.dist=FALSE)$D[n_mats,]
+    hamming = compute_struct_hamming_distance(bn_structures)[n_mats,]
 
     # Print and return output
     print("Only the distance between the network from Ass1 and every other network is displayed.")
