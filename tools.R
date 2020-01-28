@@ -28,6 +28,47 @@ bnlearn2dagitty = function(structure) {
     g_dag
 }
 
+load_original_net = function() {
+    dag = dagitty('
+                dag{
+                    area [pos="0,4"]
+                    ISI [pos="-1,3"]
+                    weekend [pos="1,3"]
+                    FFMC [pos="-1,2"]
+                    DMC [pos="0,2"]
+                    DC [pos="1,2"]
+                    wind [pos="-2,1"]
+                    temp [pos="-1,1"]
+                    RH [pos="0,1"]
+                    avg_wind [pos="-2,0"]
+                    avg_temp [pos="-0.5,0"]
+                    ISI -> area
+                    DMC -> area
+                    DC -> area
+                    weekend -> area
+                    wind -> ISI
+                    FFMC -> ISI
+                    wind -> FFMC
+                    avg_temp -> FFMC
+                    RH -> FFMC
+                    avg_temp -> DMC 
+                    RH -> DMC
+                    avg_wind -> DC
+                    avg_temp -> DC
+                    temp <-> wind
+                    temp -> RH
+                    avg_temp -> RH
+                    avg_temp -> temp
+                    avg_wind -> wind
+                    avg_temp <-> avg_wind
+                }
+                ')
+    bnlearn_dag = model2network(toString(dag,"bnlearn"))
+    adjacency_mat = amat(bnlearn_dag)
+    network_object = list("dagitty"=dag, "bnlearn"=bnlearn_dag, "adjacency_mat"=adjacency_mat)
+    network_object
+}
+
 # Runs the tabu and si.hiton.pc algorithms with specified parameters
 # The function returns an object with the resulting bnlearn structures, the corresponding adjacency matrices, and the evaluation metrics (betweenness, degree, and hamming). These are accessible by indexing the resulting object with $[key]
 run_experiment = function(data, algorithms=c("tabu","hiton"), 
@@ -67,5 +108,27 @@ run_experiment = function(data, algorithms=c("tabu","hiton"),
     
     return_object = list("bn_structures"=bn_structures, "adjacency_mats"=adjacency_mats, 
                          "betweenness"=betweenness, "degree"=degree, "hamming"=hamming)
+    return_object
+}
+
+compare_to_original = function(adjacency_mats) {
+    # Put original network at last index of list of adjacency matrices
+    adjacency_mats[[length(adjacency_mats)+1]] = load_original_net()$adjacency_mat
+    n_mats = NROW(adjacency_mats)
+    
+    # Compute metrics and take only the row in which the other networks are compared to the original network
+    betweenness = nd.centrality(adjacency_mats,mode="Between",out.dist=FALSE) 
+    betweenness_orig = list("D"=betweenness$D[n_mats,],"features"=betweenness$features[n_mats,])
+    degree = nd.centrality(adjacency_mats,mode="Degree",out.dist=FALSE)
+    degree_orig = list("D"=degree$D[n_mats,],"features"=degree$features[n_mats,])
+    hamming = nd.hamming(adjacency_mats,out.dist=FALSE)$D[n_mats,]
+
+    # Print and return output
+    print("Only the distance between the network from Ass1 and every other network is displayed.")
+    print("--- BETWEENNESS ---");print(betweenness_orig)
+    print("--- DEGREE ---");print(degree_orig)
+    print("--- HAMMING ---");print(hamming)
+
+    return_object = list("betweenness"=betweenness_orig, "degree"=degree_orig, "hamming"=hamming)
     return_object
 }
