@@ -117,10 +117,11 @@ compare_to_original = function(adjacency_mats) {
     n_mats = NROW(adjacency_mats)
     
     # Compute metrics and take only the row in which the other networks are compared to the original network
+    # Re-order (hardcoded with c(6,5,4,7,9,8,11,1,10,2,3)) features such that they follow the same order as the output of run_experiment() and the attribute order of the dataframe
     betweenness = nd.centrality(adjacency_mats,mode="Between",out.dist=FALSE) 
-    betweenness_orig = list("D"=betweenness$D[n_mats,],"features"=betweenness$features[n_mats,])
+    betweenness_orig = list("D"=betweenness$D[n_mats,],"features"=betweenness$features[n_mats,c(6,5,4,7,9,8,11,1,10,2,3)])
     degree = nd.centrality(adjacency_mats,mode="Degree",out.dist=FALSE)
-    degree_orig = list("D"=degree$D[n_mats,],"features"=degree$features[n_mats,])
+    degree_orig = list("D"=degree$D[n_mats,],"features"=degree$features[n_mats,c(6,5,4,7,9,8,11,1,10,2,3)])
     hamming = nd.hamming(adjacency_mats,out.dist=FALSE)$D[n_mats,]
 
     # Print and return output
