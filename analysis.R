@@ -22,6 +22,9 @@ head(ff)
 result_experiment = run_experiment(ff, is_plot=TRUE, algorithms=c("tabu","hiton"), 
                         exp_values=list(c("loglik-g","bic-g","bge"),c(0.01,0.05,0.1,0.25)))
 
+best_bn_structures = result_experiment$bn_structures[c(2,7)]
+best_adjacency_mats = result_experiment$adjacency_mats[c(2,7)]
+
 # result can be indexed like so (the first three indices/entries are from tabu and the other four from si.hiton.pc)
 # result$bn_structures; result$adjacency_mats; result$betweenness; result$degree; result$hamming
-result_comparison = compare_to_original(result_experiment$bn_structures, result_experiment$adjacency_mats)
+result_comparison = compare_to_original(best_bn_structures, best_adjacency_mats)

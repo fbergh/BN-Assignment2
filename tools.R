@@ -142,7 +142,8 @@ compare_to_original = function(bn_structures, adjacency_mats) {
     hamming = compute_struct_hamming_distance(bn_structures)[n_mats,]
 
     # Print and return output
-    print("Only the distance between the network from Ass1 and every other network is displayed.")
+    print("Only the distance between the network from Ass1 and tabu(score=bic-g), HITON(alpha=0.25), and itself is displayed.") 
+    print("The features are from the network from Ass1.")
     print("--- BETWEENNESS ---");print(betweenness_orig)
     print("--- DEGREE ---");print(degree_orig)
     print("--- HAMMING ---");print(hamming)
